@@ -1,11 +1,8 @@
-from flask import Flask, request, make_response, session
+from flask import Flask, request, make_response
 import json
 import secrets
 
 app = Flask(__name__)
-
-# Add secret key for session
-app.secret_key = secrets.token_hex(16)
 
 # Simulate a database
 user_accounts = {
@@ -27,9 +24,9 @@ def login():
         password = request.form['password']
         if username in user_accounts and user_accounts[username]['password'] == password:
             resp = make_response(f"Logged in as {username}")
-            resp.set_cookie('user_session', json.dumps({'username': username}))
-            # Generate session token
-            session['csrf_token'] = secrets.token_hex(16)
+            resp.set_cookie('user_session', json.dumps(
+                {'username': username}), samesite='Strict', httponly=True)
+            # Modify cookie
             return resp
         else:
             return "Invalid credentials", 401
@@ -69,10 +66,10 @@ def transfer():
         from_account = session_data['username']
         to_account = request.form['to']
         amount = int(request.form['amount'])
-
-        # Check CSRF token
-        if request.form.get('csrf_token') != session.get('csrf_token'):
-            return 'Invalid CSRF token', 403
+        # Checking Referer
+        referer = request.headers.get('Referer')
+        if not referer or not referer.startswith('http://127.0.0.1:5000'):
+            return "Invalid request origin", 403
 
         if to_account not in user_accounts:
             return "Recipient account does not exist", 400
