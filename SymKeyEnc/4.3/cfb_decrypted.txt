@@ -1,0 +1,1 @@
+This&is a long t¡SÇZïşÈ«ÊßÅëË at least 64 bytes long for encryption mode testing.
